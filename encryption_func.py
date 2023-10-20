@@ -1,10 +1,10 @@
-from random import randint
+from random import randint, choice
 from math import gcd
 from sympy import prime
 
 def primeGen() -> tuple[int]:
-    p = prime(randint(3, 10))
-    q = prime(randint(3, 10))
+    p = prime(randint(1000, 1500))
+    q = prime(randint(1000, 1500))
     return p, q
 
 def phi(p: int, q: int) -> int:
@@ -27,20 +27,25 @@ def phi2(n: int) -> int:
     
     return result
 
-def genE(N: int, phiN: int) -> int: # on met phi(N) en paramètre pour éviter de recalculer à chaque fois
-    for i in range(2, phiN + 1):
-        if gcd(i, N) == gcd(i, phiN) == 1:
-            return i
+def genE(phiN: int) -> int: # on met phi(N) en paramètre pour éviter de recalculer à chaque fois
+    L = []
+    for i in range(3, phiN):
+        if gcd(i, phiN) == 1:
+            L.append(i)
+    return choice(L[len(L)//2:])
 
-def genD(e: int, phiN: int, N: int) -> int:
-    return (randint(2, (N-e)//phiN)*phiN) + e
+def genD(e: int, phiN: int) -> int:
+    for d in range(3, phiN):
+        if (d * e) % phiN == 1:
+            return d
+    raise ValueError("d n'existe pas")
 
 def genKeys() -> tuple[tuple[int]]:
     p, q = primeGen()
     N = p * q
     phiN = phi(p, q)
-    e = genE(N, phiN)
-    d = genD(e, phiN, N)
+    e = genE(phiN)
+    d = genD(e, phiN)
 
     return ((e, N), (d, N))
 
